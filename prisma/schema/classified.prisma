@@ -11,7 +11,83 @@ model Classified {
   seats Int @default(5)
   price Int @default(0) 
   makeId Int @map("make_id")
+  make Make @relation(fields: [makeId], references: [id])
   modelId Int @map("model_id")
+  model Model @relation(fields: [modelId], references: [id])
   modelVariantId Int @map("model_variant_id")
-  
+  modelVariant ModelVariant? @relation(fields: [modelVariantId], references: [id])
+  ulezCompliance ULEZCompliance @default(EXEMPT)
+  transmission Transmission @default(MANUAL)
+  color Color @default(BLACK)
+  fuelType FuelType @default(PETROL)
+  bodyType BodyType @default(SEDAN)
+  odoUnit OdoUnit @default(MILES)
+  currency CurrencyCode @default(GBP)
+  status ClassifiedStatus @default(DRAFT)
+  images Image[] 
+  customers Customer[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([makeId, modelId], name: "index_make_model")
+  @@index([status], name: "index_status")
+  @@index([price], name: "index_price")
+  @@map("classifieds")
+}
+
+enum ClassifiedStatus {
+  LIVE
+  DRAFT
+  SOLD
+}
+
+enum CurrencyCode {
+  GBP
+  USD
+  EUR
+}
+
+enum OdoUnit {
+  MILES
+  KILOMETERS
+}
+
+enum BodyType {
+  SEDAN
+  HATCHBACK
+  SUV
+  MPV
+  CONVERTIBLE
+  WAGON
+}
+
+enum FuelType {
+  PETROL
+  DIESEL
+  ELECTRIC
+  HYBRID
+}
+
+enum ULEZCompliance {
+  EXEMPT
+  NON_EXEMPT
+}
+
+enum Transmission {
+  MANUAL
+  AUTOMATIC
+}
+
+enum Color {
+  BLACK
+  WHITE
+  RED
+  BLUE
+  GREEN
+  YELLOW
+  SILVER
+  GREY
+  BROWN
+  GOLD
+  PINK
 }
