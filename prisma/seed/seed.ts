@@ -5,9 +5,9 @@ import { seedImages } from "./images.seed";
 const prisma = new PrismaClient();
 
 async function main() {
-  // await prisma.$executeRaw`TRUNCATE TABLE "makes" RESTART IDENTITY CASCADE`;
-  // await seedTaxonomy(prisma);
-  // await seedClassifieds(prisma);
+  await prisma.$executeRaw`TRUNCATE TABLE "makes" RESTART IDENTITY CASCADE`;
+  await seedTaxonomy(prisma);
+  await seedClassifieds(prisma);
   await seedImages(prisma);
 }
 
