@@ -49,7 +49,7 @@ export const POST = async (request: NextRequest) => {
   }
 
   // store the updated favorites in redis
-  await redis.set(sourceId!, favorites);
+  await redis.set(sourceId || "", favorites);
   revalidatePath(routes.favorites);
 
   return NextResponse.json(

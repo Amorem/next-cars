@@ -38,7 +38,7 @@ export function FavoriteButton(props: FavoriteButtonProps) {
       size={"icon"}
       className={cn(
         "absolute top-2.5 left-3.5 rounded-full z-10 group !h-6 !w-6 lg:!h-8 lg:!w-8 xl:!h-10 xl:!w-10",
-        isFavorite ? "bg-white" : "bg-muted/15"
+        isFavorite ? "hover:bg-muted/30" : "hover:bg-pink-500/40"
       )}
     >
       <HeartIcon
