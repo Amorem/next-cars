@@ -8,6 +8,7 @@ import {
   PaginationItem,
   PaginationLink,
 } from "@/components/ui/pagination";
+import { useState } from "react";
 import { useQueryState } from "nuqs";
 interface CustomPaginationProps {
   baseUrl: string;
@@ -38,6 +39,8 @@ export default function CustomPagination({
     serialize: (value) => value.toString(),
     shallow: false,
   });
+
+  const [visibleRange, setVisibleRange] = useState<number[]>([]);
 
   return (
     <PaginationRoot className={styles.paginationRoot}>
