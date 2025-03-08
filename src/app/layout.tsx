@@ -39,7 +39,7 @@ export default function RootLayout({
           mulish.variable
         )}
       >
-        <NextTopLoader showSpinner />
+        <NextTopLoader showSpinner={false} />
         <NuqsAdapter>{children}</NuqsAdapter>
         <Toaster />
       </body>

@@ -8,8 +8,11 @@ import {
   PaginationItem,
   PaginationLink,
 } from "@/components/ui/pagination";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQueryState } from "nuqs";
+import { env } from "@/env";
+import { cn } from "@/lib/utils";
+
 interface CustomPaginationProps {
   baseUrl: string;
   totalPages: number;
@@ -18,7 +21,6 @@ interface CustomPaginationProps {
     paginationRoot: string;
     paginationPrevious: string;
     paginationNext: string;
-    paginationItem: string;
     paginationLink: string;
     paginationLinkActive: string;
   };
@@ -40,23 +42,128 @@ export default function CustomPagination({
     shallow: false,
   });
 
-  const [visibleRange, setVisibleRange] = useState<number[]>([]);
+  const [visibleRange, setVisibleRange] = useState({
+    start: 1,
+    end: Math.min(maxVisiblePages, totalPages),
+  });
+
+  useEffect(() => {
+    const halfVisible = Math.floor(maxVisiblePages / 2);
+    const newStart = Math.max(
+      1,
+      Math.min(currentPage - halfVisible, totalPages - maxVisiblePages + 1)
+    );
+    const newEnd = Math.min(newStart + maxVisiblePages - 1, totalPages);
+    setVisibleRange({
+      start: newStart,
+      end: newEnd,
+    });
+  }, [currentPage, maxVisiblePages, totalPages]);
+
+  function createPageUrl(pageNumber: number) {
+    const url = new URL(baseUrl, env.NEXT_PUBLIC_APP_URL);
+    url.searchParams.set("page", pageNumber.toString());
+    return url.toString();
+  }
+
+  function handleEllipsisClick(direction: "left" | "right") {
+    const newPage =
+      direction === "left"
+        ? Math.max(1, visibleRange.start - maxVisiblePages)
+        : Math.min(totalPages, visibleRange.end + maxVisiblePages);
+    setCurrentPage(newPage);
+  }
 
   return (
     <PaginationRoot className={styles.paginationRoot}>
       <PaginationContent className="lg:gap-4">
         <PaginationItem>
-          <PaginationPrevious></PaginationPrevious>
+          <PaginationPrevious
+            className={cn(
+              currentPage <= 1 && "hidden",
+              styles.paginationPrevious
+            )}
+            href={createPageUrl(currentPage - 1)}
+            onClick={(e) => {
+              e.preventDefault();
+              if (currentPage > 1) setCurrentPage(currentPage - 1);
+            }}
+          />
         </PaginationItem>
+
+        {visibleRange.start > 1 && (
+          <PaginationItem className="hidden lg:block">
+            <PaginationLink
+              className={styles.paginationLink}
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                handleEllipsisClick("left");
+              }}
+            >
+              ...
+            </PaginationLink>
+          </PaginationItem>
+        )}
+
+        {Array.from(
+          { length: visibleRange.end - visibleRange.start + 1 },
+          (_, index) => visibleRange.start + index
+        ).map((pageNumber) => {
+          const isActive = pageNumber === currentPage;
+          let rel = "";
+          if (pageNumber === currentPage - 1) {
+            rel = "prev";
+          }
+          if (pageNumber === currentPage + 1) {
+            rel = "next";
+          }
+          return (
+            <PaginationItem key={pageNumber}>
+              <PaginationLink
+                isActive={isActive}
+                href={createPageUrl(pageNumber)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setCurrentPage(pageNumber);
+                }}
+                {...(rel ? { rel } : {})}
+                className={cn(
+                  styles.paginationLink,
+                  isActive && styles.paginationLinkActive
+                )}
+              />
+            </PaginationItem>
+          );
+        })}
+
+        {visibleRange.end < totalPages && (
+          <PaginationItem className="hidden lg:block">
+            <PaginationLink
+              className={styles.paginationLink}
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                handleEllipsisClick("right");
+              }}
+            >
+              ...
+            </PaginationLink>
+          </PaginationItem>
+        )}
+
         <PaginationItem>
-          <PaginationLink></PaginationLink>
-        </PaginationItem>
-        {/* Pages go here */}
-        <PaginationItem>
-          <PaginationLink></PaginationLink>
-        </PaginationItem>
-        <PaginationItem>
-          <PaginationNext></PaginationNext>
+          <PaginationNext
+            className={cn(
+              currentPage >= totalPages && "hidden",
+              styles.paginationNext
+            )}
+            href={createPageUrl(currentPage + 1)}
+            onClick={(e) => {
+              e.preventDefault();
+              if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+            }}
+          />
         </PaginationItem>
       </PaginationContent>
     </PaginationRoot>

@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import ClassifiedList from "@/components/inventory/classified-list";
 import { redis } from "@/lib/redis-store";
 import { getSourceId } from "@/lib/source-id";
+import CustomPagination from "@/components/shared/custom-pagination";
+import { routes } from "@/config/routes";
 
 const getInventory = async (searchParams: AwaitedPageProps["searchParams"]) => {
   return prisma.classified.findMany({
@@ -31,6 +33,17 @@ export default async function InventoryPage(props: PageProps) {
             </h2>
             {/* <DialogFilter />  */}
           </div>
+          <CustomPagination
+            styles={{
+              paginationRoot: "flex justify-end",
+              paginationPrevious: "",
+              paginationNext: "",
+              paginationLink: "border-none active:border",
+              paginationLinkActive: "",
+            }}
+            baseUrl={routes.inventory}
+            totalPages={9}
+          />
           <ClassifiedList
             classifieds={classifieds}
             favorites={favorites ? favorites.ids : []}
