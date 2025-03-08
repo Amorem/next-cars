@@ -132,7 +132,9 @@ export default function CustomPagination({
                   styles.paginationLink,
                   isActive && styles.paginationLinkActive
                 )}
-              />
+              >
+                {pageNumber}
+              </PaginationLink>
             </PaginationItem>
           );
         })}
